@@ -1,5 +1,4 @@
-﻿const fetch = require('node-fetch');
-const REQUEST_URL = 'https://api.popcash.net/';
+﻿const REQUEST_URL = 'https://api.popcash.net/';
 
 class PopcashApi {
 
@@ -8,15 +7,16 @@ class PopcashApi {
   }
 
   async getCampaigns() {
-    let result = await this.apiRequest('campaigns', 'GET');
+    let {ok, result, errorMessage} = await this.apiRequest('campaigns', 'GET');
     if (!result?.campaigns?.items) {
-      return false;
+      return {ok, errorMessage};
     }
-    return result.campaigns.items.map(item => {
+    result = result.campaigns.items.map(item => {
       item.id = Number(item.id);
-      item.status = this.getStatusById(item.status);
+      item.status = this.#getStatusById(item.status);
       return item;
     });
+    return {ok, result};
   }
 
   /**
@@ -41,7 +41,12 @@ class PopcashApi {
     return await this.apiRequest('campaigns/' + campaignId, 'PUT', body);
   }
 
-  getStatusById(statusId) {
+  async getStatistics(campaignId, params) {
+    let url = 'reports/advertiser/campaign/' + campaignId;
+    return await this.apiRequest(url, 'POST', params);
+  }
+
+  #getStatusById(statusId) {
     switch (statusId) {
       case 0: return 'Pending';
       case 1: return 'Running';
@@ -54,7 +59,7 @@ class PopcashApi {
       case 8: return 'Scheduled Pause';
       case 9: return 'System blocked';
       case 10: return 'Held';
-      default: return statusId
+      default: return statusId;
     }
   }
 
@@ -68,13 +73,13 @@ class PopcashApi {
       result = await result.json();
     } catch (e) {
       console.error(new Date().toLocaleString(), 'api popcash ' + action + ' error:', e.message);
-      return false;
+      return {ok: false, errorMessage: e.message};
     }
     if (result.errors) {
       console.error(new Date().toLocaleString(), 'api popcash ' + action + ' error:', result);
-      return false;
+      return {ok: false, errorMessage: result.errors};
     }
-    return result;
+    return {ok: true, result};
   }
 
 }

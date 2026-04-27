@@ -1,12 +1,11 @@
 {
   "name": "popcash-api",
   "main": "PopcashApi.js",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "PopcashApi api integration",
-  "repository": "https://github.com/nebaz/popcashapi.git",
+  "repository": "https://github.com/nebaz/popcash-api.git",
   "license": "MIT",
   "author": "Nebaz <nebaz@ya.ru>",
   "dependencies": {
-    "node-fetch": "~2.6.7"
   }
 }
